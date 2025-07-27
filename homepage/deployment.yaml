@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: homepage
+    namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: homepage
+  template:
+    metadata:
+      labels:
+        app: homepage
+    spec:
+      containers:
+      - name: homepage
+        image: ghcr.io/gethomepage/homepage:latest
+        env:
+          - name: HOMEPAGE_ALLOWED_HOSTS
+            value: "home.local,192.168.1.67"
+        ports:
+        - containerPort: 3000
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+        volumeMounts:
+          - mountPath: /app/config/custom.js
+            name: homepage-config
+            subPath: custom.js
+          - mountPath: /app/config/custom.css
+            name: homepage-config
+            subPath: custom.css
+          - mountPath: /app/config/bookmarks.yaml
+            name: homepage-config
+            subPath: bookmarks.yaml
+          - mountPath: /app/config/docker.yaml
+            name: homepage-config
+            subPath: docker.yaml
+          - mountPath: /app/config/kubernetes.yaml
+            name: homepage-config
+            subPath: kubernetes.yaml
+          - mountPath: /app/config/services.yaml
+            name: homepage-config
+            subPath: services.yaml
+          - mountPath: /app/config/settings.yaml
+            name: homepage-config
+            subPath: settings.yaml
+          - mountPath: /app/config/widgets.yaml
+            name: homepage-config
+            subPath: widgets.yaml
+      volumes:
+      - name: homepage-config 
+        configMap:
+          name: homepage-config
+
