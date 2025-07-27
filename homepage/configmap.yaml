@@ -14,12 +14,20 @@ data:
       - Github:
         - abbr: GH
           href: https://github.com/
+
   services.yaml: |
     - My First Group:
-      - My First Service:
-        href: https://localhost/
-        description: Homepage is awesome
-    
+        - My First Service:
+            href: https://google.com/
+            description: Homepage is awesome
+        - My test Service:
+            href: https://google.com/
+            description: Homepage is awesome
+    - My secondGroup:
+        - My second Service:
+            href: https://github.com/
+            description: Homepage is awesome
+
   widgets.yaml: |
         - kubernetes:
             cluster:
