@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pihole-config
+data:
+  01-pihole.conf: |
+    # example
+  setupVars.conf: |
+    # examples
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pihole
+  namespace: default
+spec:
+  replicas: 1                    # only one Pod
+  selector:
+    matchLabels:
+      app: pihole
+  template:
+    metadata:
+      labels:
+        app: pihole
+    spec:
+      hostNetwork: true          # Pi‑hole must bind :53 on the node
+      containers:
+      - name: pihole
+        image: pihole/pihole:latest
+        imagePullPolicy: Always
+        env:
+        - name: WEB_PORT
+          value: "80"
+        - name: WEBPASSWORD
+          value: "Welcome"
+        securityContext:
+          capabilities:
+            add: [NET_ADMIN, NET_BIND_SERVICE, NET_RAW]
+        volumeMounts:
+          - name: config
+            mountPath: /etc/dnsmasq.d/01-pihole.conf
+            subPath: 01-pihole.conf
+          - name: config
+            mountPath: /etc/pihole/setupVars.conf
+            subPath: setupVars.conf
+      volumes: 
+        - name: config
+          configMap:
+            name: pihole-config
