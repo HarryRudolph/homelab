@@ -1,8 +1,12 @@
+# Homelab
+Config files for home server. 
 
+## Running
 
-
-
+```bash
 export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
+
+```
 
 ## TODO:
 - [ ] Local image harbour
@@ -10,4 +14,7 @@ export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
 - [ ] archive vids
 - [ ] jellyfin 
 
-commafeed?
+- [ ] commafeed?
+- [ ] Borg base for backup
+- [ ] https://github.com/SixtyAteWhiskey/Atlas 
+- [ ] https://underpassapp.com/StopTheMadness/
