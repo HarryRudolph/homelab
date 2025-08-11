@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pihole-etc
+  namespace: pihole
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources: { requests: { storage: 1Gi } }
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pihole-dnsmasq
+  namespace: pihole
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources: { requests: { storage: 1Gi } }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pihole
+  namespace: pihole
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: pihole }
+  template:
+    metadata:
+      labels: { app: pihole }
+    spec:
+      containers:
+        - name: pihole
+          image: pihole/pihole:latest
+          env:
+            - name: TZ
+              value: Europe/London
+            - name: DNSMASQ_LISTENING       # listen on all interfaces
+              value: "all"
+            - name: FTLCONF_webserver_api_password
+              value: "correcthorsebatterystaple"
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+            - name: dns-udp
+              containerPort: 53
+              protocol: UDP
+            - name: dns-tcp
+              containerPort: 53
+              protocol: TCP
+          volumeMounts:
+            - { name: etc-pihole,  mountPath: /etc/pihole }
+            - { name: etc-dnsmasq, mountPath: /etc/dnsmasq.d }
+      volumes:
+        - name: etc-pihole
+          persistentVolumeClaim: { claimName: pihole-etc }
+        - name: etc-dnsmasq
+          persistentVolumeClaim: { claimName: pihole-dnsmasq }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pihole-lb
+  namespace: pihole
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 192.168.1.67 
+  externalTrafficPolicy: Local  
+  selector:
+    app: pihole
+  ports:
+    - name: dns-udp
+      port: 53
+      targetPort: 53
+      protocol: UDP
+    - name: dns-tcp
+      port: 53
+      targetPort: 53
+      protocol: TCP
+    - name: http
+      port: 80
+      targetPort: 80
+      protocol: TCP
+
